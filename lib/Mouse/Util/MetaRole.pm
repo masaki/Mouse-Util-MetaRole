@@ -196,7 +196,7 @@ sub _reinitialize_metaclass {
 
 =head1 NAME
 
-Mouse::Util::MetaRole - Apply role to class and attribute metaclass.
+Mouse::Util::MetaRole - Apply roles to any metaclass, as well as the object base class
 
 =head1 SYNOPSIS
 
