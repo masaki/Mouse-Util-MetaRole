@@ -14,6 +14,19 @@ sub apply_metaclass_roles {
     return _make_new_metaclass($opts{for_class}, \%opts);
 }
 
+sub apply_base_class_roles {
+    my %opts = @_;
+
+    my $meta = Mouse::Meta::Class->initialize($opts{for_class});
+    my $new_base = _make_new_class($meta->name, $opts{roles} || [], [ $meta->superclasses ]);
+
+    if ($new_base ne $meta->name) {
+        $meta->superclasses($new_base);
+    }
+
+    return $meta;
+}
+
 sub _make_new_metaclass {
     my $for  = shift;
     my $opts = shift;
