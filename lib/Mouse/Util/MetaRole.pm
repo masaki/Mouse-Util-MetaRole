@@ -45,8 +45,8 @@ sub _make_new_class {
     my $superclasses = shift || [$class];
 
     my $meta = Mouse::Meta::Class->initialize($class);
-    return $meta unless $roles;
-    return $meta if $meta->can('does_role') and all { $meta->does_role($_) } @$roles;
+    return $class unless $roles;
+    return $class if $meta->can('does_role') and all { $meta->does_role($_) } @$roles;
 
     my $new_metaclass = Mouse::Meta::Class->create_anon_class(
         superclasses => $superclasses,
