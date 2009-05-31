@@ -212,8 +212,13 @@ Mouse::Util::MetaRole - Apply role to class and attribute metaclass.
 
         Mouse::Util::MetaRole::apply_metaclass_roles(
             for_class                 => $caller,
-            metaclass_roles           => [],
-            attribute_metaclass_roles => [],
+            metaclass_roles           => ['MyApp::Role::Meta::Class'],
+            attribute_metaclass_roles => ['MyApp::Role::Meta::Attribute'],
+        );
+
+        Moose::Util::MetaRole::apply_base_class_roles(
+            for_class => $caller,
+            roles     => ['MyApp::Role::Object'],
         );
     }
 
@@ -250,6 +255,10 @@ specified metaclass. You can pass any or all of these parameters at
 once.
 
 =back
+
+=head2 apply_base_class_roles(for_class => $class, roles => \@roles)
+
+This function will apply the specified roles to the object's base class.
 
 =head1 AUTHOR
 
