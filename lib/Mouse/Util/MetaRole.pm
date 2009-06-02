@@ -44,9 +44,7 @@ sub _make_new_metaclass {
             $opts->{attribute_metaclass_roles},
         );
 
-        no strict 'refs';
-        no warnings 'redefine';
-        *{ $new_metaclass . '::attribute_metaclass' } = sub { $attribute_metaclass };
+        $new_meta->attribute_metaclass($attribute_metaclass);
     }
 
     return _reinitialize_metaclass($for, $new_meta);
@@ -83,17 +81,19 @@ sub _reinitialize_metaclass {
     return $meta;
 }
 
-{ # FIXME: Mouse::Meta::Class#add_attribute should use attribute_metaclass()
-    package # hide from PAUSE
-        Mouse::Meta::Class;
+{
     use Carp 'confess';
     use Scalar::Util 'blessed';
-    use Mouse::Util;
+
     no warnings 'redefine';
 
-    *attribute_metaclass = sub { 'Mouse::Meta::Attribute' };
+    *Mouse::Meta::Class::attribute_metaclass = sub {
+        $_[0]->{attribute_metaclass} = $_[1] if defined $_[1];
+        $_[0]->{attribute_metaclass} ||= 'Mouse::Meta::Attribute';
+    };
 
-    *add_attribute = sub {
+    # FIXME: Mouse::Meta::Class#add_attribute should use attribute_metaclass()
+    *Mouse::Meta::Class::add_attribute = sub {
         my $self = shift;
 
         if (@_ == 1 && blessed($_[0])) {
@@ -126,7 +126,8 @@ sub _reinitialize_metaclass {
         }
     };
 
-    *create = sub {
+    # FIXME: Mouse::Meta::Class#create should use attribute_metaclass()
+    *Mouse::Meta::Class::create = sub {
         my ($self, $package_name, %options) = @_;
 
         (ref $options{superclasses} eq 'ARRAY')
