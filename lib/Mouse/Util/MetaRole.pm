@@ -59,13 +59,10 @@ sub _make_new_class {
     return $class unless $roles;
     return $class if $meta->can('does_role') and all { $meta->does_role($_) } @$roles;
 
-    my $new_metaclass = Mouse::Meta::Class->create_anon_class(
+    return Mouse::Meta::Class->create_anon_class(
         superclasses => $superclasses,
+        roles        => $roles,
     )->name;
-
-    Mouse::Util::apply_all_roles($new_metaclass, @$roles);
-
-    return $new_metaclass;
 }
 
 sub _reinitialize_metaclass {
@@ -134,6 +131,11 @@ sub _reinitialize_metaclass {
             || confess "You must pass an ARRAY ref of superclasses"
                 if exists $options{superclasses};
 
+        # XXX: added roles check
+        (ref $options{roles} eq 'ARRAY')
+            || confess "You must pass an ARRAY ref of roles"
+                if exists $options{roles};
+
         (ref $options{attributes} eq 'ARRAY')
             || confess "You must pass an ARRAY ref of attributes"
                 if exists $options{attributes};
@@ -160,6 +162,7 @@ sub _reinitialize_metaclass {
         delete @initialize_options{qw(
             package
             superclasses
+            roles
             attributes
             methods
             version
@@ -190,6 +193,10 @@ sub _reinitialize_metaclass {
                 $meta->add_method($method_name, $options{methods}->{$method_name});
             }
         }
+
+        # XXX: added apply_roles
+        Mouse::Util::apply_all_roles($meta->name, @{$options{roles}});
+
         return $meta;
     };
 }
