@@ -102,7 +102,7 @@ sub _reinitialize_metaclass {
         } else {
             my $names = shift @_;
             $names = [$names] if !ref($names);
-            my $metaclass = $self->attribute_metaclass;
+            my $metaclass = $self->attribute_metaclass; # XXX: replaced attribute_metaclass
             my %options = @_;
 
             if ( my $metaclass_name = delete $options{metaclass} ) {
@@ -181,6 +181,7 @@ sub _reinitialize_metaclass {
         # I think this should be the order of things.
         if (exists $options{attributes}) {
             foreach my $attr (@{$options{attributes}}) {
+                # XXX: replaced attribute_metaclass
                 $self->attribute_metaclass->create($meta, $attr->{name}, %$attr);
             }
         }
